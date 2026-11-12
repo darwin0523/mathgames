@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Number Play</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#eef0ff;--bg2:#fdeff6;--card:#fff;--ink:#14172b;--mut:#6b7090;--line:#e4e6f4;--chip:#f4f5fc;--acc:#5b5bf0;--accs:#e9e9ff;--pink:#f0457c;--pinks:#ffe6ef;--ok:#12a366;--oks:#dcf6e8;--bad:#e5484d;--sh:0 30px 60px -30px rgba(60,60,140,.45);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#0f1120;--bg2:#1c1033;--card:#1a1d33;--ink:#f1f2ff;--mut:#9ca0c4;--line:#2b2f52;--chip:#23274a;--acc:#8b8bff;--accs:#2a2c5e;--pink:#ff7aa5;--pinks:#4a2240;--ok:#4fd18b;--oks:#17382b;--bad:#ff7b7f;--sh:0 30px 60px -30px #000}}
+:root[data-theme="dark"]{--bg1:#0f1120;--bg2:#1c1033;--card:#1a1d33;--ink:#f1f2ff;--mut:#9ca0c4;--line:#2b2f52;--chip:#23274a;--acc:#8b8bff;--accs:#2a2c5e;--pink:#ff7aa5;--pinks:#4a2240;--ok:#4fd18b;--oks:#17382b;--bad:#ff7b7f;--sh:0 30px 60px -30px #000}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;padding:16px}
+.frame{width:min(920px,100%);border-radius:28px;background:var(--card);padding:24px;box-shadow:var(--sh)}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:1.45rem;margin:0;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+h1::before{content:"";width:16px;height:16px;border-radius:6px;background:linear-gradient(135deg,var(--acc),var(--pink))}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.ops{display:flex;gap:2px;padding:4px;background:var(--chip);border-radius:999px}
+.op{width:46px;height:40px;border-radius:999px;background:transparent;font-size:1.4rem;font-weight:700;line-height:1;transition:background .15s,color .15s}
+.op[aria-pressed=true]{background:var(--acc);color:#fff;box-shadow:0 6px 14px -6px var(--acc)}
+.strip{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;margin:22px 0 14px}
+.strip button{aspect-ratio:1;border-radius:16px;background:var(--chip);font-size:1.35rem;font-weight:700;transition:transform .1s,background .15s,color .15s}
+.strip button:hover{background:var(--accs);color:var(--acc)}
+.strip button:active{transform:scale(.92)}
+.eq{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px 0}
+.box{min-width:76px;height:76px;border-radius:22px;display:grid;place-items:center;font-size:2.4rem;font-weight:800;padding:0 10px;background:var(--chip)}
+.slot[data-s=a]{background:var(--accs);color:var(--acc)}
+.slot[data-s=b]{background:var(--pinks);color:var(--pink)}
+.slot.on{box-shadow:0 0 0 3px var(--card),0 0 0 6px currentColor}
+.sym{background:transparent;color:var(--mut);min-width:36px;padding:0}
+.ans{min-width:100px;background:var(--card);border:2px dashed var(--line)}
+.ans.ok{background:var(--oks);color:var(--ok);border:2px solid var(--ok)}
+.ans.no{animation:shake .35s;color:var(--bad);border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.scene{min-height:210px;display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;padding:18px;margin:10px 0;border-radius:26px;background:linear-gradient(160deg,var(--chip),transparent 120%);--s:2rem}
+.grp{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:340px;padding:8px;border-radius:18px}
+.grp.bx{background:var(--card);box-shadow:0 6px 18px -10px rgba(60,60,140,.5)}
+.it{font-size:var(--s);line-height:1.15;animation:pop .25s both}
+.it.gone{opacity:.3;filter:grayscale(1);position:relative}
+.it.gone::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;font-size:.9em;color:var(--bad);font-weight:800}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.lab{width:100%;text-align:center;font-weight:600;color:var(--mut)}
+.msg{min-height:32px;text-align:center;font-size:1.05rem;font-weight:700;color:var(--mut)}
+.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.tray{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:12px;padding-top:18px;border-top:1px solid var(--line)}
+.objs,.pad,.act{display:flex;gap:6px;flex-wrap:wrap}
+.obj{width:48px;height:48px;border-radius:14px;background:var(--chip);font-size:1.5rem}
+.obj[aria-pressed=true]{background:var(--accs);box-shadow:0 0 0 2px var(--acc)}
+.pad button{width:40px;height:40px;border-radius:12px;background:var(--chip);font-weight:700;font-size:1.1rem}
+.pad button:hover{background:var(--accs)}
+.act button{padding:11px 18px;border-radius:999px;background:var(--chip);font-weight:700;font-size:.95rem}
+.act .go{background:var(--acc);color:#fff;box-shadow:0 8px 18px -8px var(--acc)}
+.act .go:disabled{opacity:.35;box-shadow:none;cursor:default}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:620px){.frame{padding:16px;border-radius:22px}.strip{grid-template-columns:repeat(5,1fr)}.box{min-width:60px;height:60px;font-size:1.8rem;border-radius:18px}.pad button{width:36px}}
+body{user-select:none;-webkit-user-select:none}
+.scene{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0;background:none;min-height:0}
+.zone{min-height:190px;border-radius:22px;border:2px dashed var(--line);background:var(--chip);padding:10px}
+.zone.hot{border-color:var(--acc);background:var(--accs)}
+.zl{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--mut);font-size:.85rem}
+.zl b{background:var(--card);color:var(--acc);border-radius:999px;padding:0 10px;min-width:28px;text-align:center}
+.zi{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+.it{font-size:1.9rem;cursor:grab;touch-action:none;animation:none}
+.strip button,.obj{touch-action:none;cursor:grab}
+.hint{text-align:center;color:var(--mut);font-weight:600;font-size:.95rem;min-height:24px}
+.ghost{position:fixed;transform:translate(-50%,-50%) scale(1.1);font-size:2.2rem;font-weight:800;pointer-events:none;z-index:99;background:var(--card);padding:2px 14px;border-radius:16px;box-shadow:0 14px 30px -8px rgba(0,0,0,.45)}
+.slot.hot,.ans.hot{box-shadow:0 0 0 4px var(--acc)}
+.cap{font-weight:700;color:var(--mut);font-size:.9rem}
+@media (max-width:620px){.scene{grid-template-columns:1fr}.zone{min-height:110px}}
+.hd{display:flex;gap:10px;align-items:center}
+.mus{width:44px;height:44px;border-radius:50%;background:var(--chip);font-size:1.2rem;line-height:1}
+.mus[aria-pressed=true]{background:var(--accs);box-shadow:0 0 0 2px var(--acc)}
+</style></head>
+<body>
+<main class="frame">
+<header><h1>Number Play</h1>
+<div class="hd"><button class="mus" id="mus" aria-pressed="false" aria-label="Background music">🎵</button><div class="ops" id="ops" role="group" aria-label="Operation"></div></div></header>
+<div class="strip" id="strip" aria-label="Number strip: drag a number into the equation"></div>
+<div class="eq" id="eq"></div>
+<div class="hint" id="hint"></div>
+<div class="scene" id="scene"></div>
+<div class="msg" id="msg" aria-live="polite"></div>
+<div class="tray">
+<div class="objs" id="objs" role="group" aria-label="Objects: drag onto the board"></div>
+<div class="pad" id="pad" aria-label="Answer keypad"></div>
+<div class="act"><button id="rand">New problem</button><button id="show">Show me</button><button id="clr">Clear</button><button class="go" id="chk">Check</button></div>
+</div>
+</main>
+<script>
+var OPS=["+","−","×","÷"],OBJ=["🍎","🐨","🦋","⭐"],NAMES=["Add","Subtract","Multiply","Divide"];
+var S={a:null,b:null,op:"+",ans:"",act:"a",done:false,z:{A:[],B:[],R:[]}};
+var $=function(i){return document.getElementById(i)};
+function ok(){var a=S.a,b=S.b;
+ if(a==null||b==null)return"Drag two numbers from the strip into the equation.";
+ if(S.op=="−"&&b>a)return"Pick a bigger first number so the answer is not negative.";
+ if(S.op=="÷"&&a%b)return a+" cannot be shared evenly into "+b+" groups. Try another pair, like 8 ÷ 2.";
+ return""}
+function sol(){var a=S.a,b=S.b;return S.op=="+"?a+b:S.op=="−"?a-b:S.op=="×"?a*b:a/b}
+function hint(){var a=S.a,b=S.b,o=S.op;if(a==null||b==null||ok())return"";
+ return o=="+"?"Drag "+a+" objects and "+b+" objects in, then move them together to count.":
+ o=="−"?"Drag "+a+" objects in. Drag "+b+" out of the board, then count what is left.":
+ o=="×"?"Make "+a+" groups of "+b+", then count all of them.":
+ "Share "+a+" objects into "+b+" equal groups. How many in each?"}
+function eq(){
+ $("eq").innerHTML='<button class="box slot'+(S.act=="a"?" on":"")+'" data-s="a" data-drop="sa" aria-label="First number">'+(S.a==null?"?":S.a)+'</button><div class="box sym">'+S.op+'</div><button class="box slot'+(S.act=="b"?" on":"")+'" data-s="b" data-drop="sb" aria-label="Second number">'+(S.b==null?"?":S.b)+'</button><div class="box sym">=</div><div class="box ans'+(S.done?" ok":"")+'" id="ansbox" data-drop="ans">'+(S.ans===""?"&nbsp;":S.ans)+"</div>";
+ $("chk").disabled=!!ok()||S.ans===""||S.done}
+function zones(){var L=["First number","Second number",S.op=="+"?"Together":S.op=="−"?"Left":"Answer"];
+ $("scene").innerHTML=["A","B","R"].map(function(k,i){var n=S.z[k].length;
+ return'<div class="zone" data-drop="'+k+'"><div class="zl">'+L[i]+"<b>"+n+'</b></div><div class="zi">'+S.z[k].map(function(e,j){return'<span class="it" data-k="'+k+'" data-j="'+j+'">'+e+"</span>"}).join("")+"</div></div>"}).join("")}
+function draw(){eq();zones();$("hint").textContent=hint();
+ if(!S.done&&!S.keep){$("msg").className="msg";$("msg").textContent=ok()}S.keep=false}
+function say(t,c){S.keep=true;$("msg").textContent=t;$("msg").className="msg "+(c||"")}
+function reset(){S.ans="";S.done=false}
+function pick(n){reset();if(S.act=="a"){S.a=n;S.act="b"}else{S.b=n;S.act="a"}draw()}
+function check(){if(ok()||S.ans==="")return;
+ if(Number(S.ans)==sol()){S.done=true;draw();say("Correct! "+S.a+" "+S.op+" "+S.b+" = "+S.ans+" 🎉","ok")}
+ else{draw();var el=$("ansbox");el.classList.add("no");say("Not quite. Count the objects and try again.","no");
+  setTimeout(function(){S.ans="";draw();say("Try again!","no")},550)}}
+function drop(p,t){
+ if(p.t=="n"){
+  if(t=="sa"){reset();S.a=p.v;S.act="b";draw()}
+  else if(t=="sb"){reset();S.b=p.v;S.act="a";draw()}
+  else if(t=="ans"&&!ok()){S.done=false;S.ans=String(p.v);draw();check()}
+  return}
+ if(p.k)S.z[p.k].splice(p.j,1);
+ if(S.z[t]&&S.z[t].length<30)S.z[t].push(p.e);
+ draw()}
+function drag(e,pay,label){
+ if(e.button>0)return;var x0=e.clientX,y0=e.clientY,g=null,hot=null;
+ function mv(ev){
+  if(!g&&Math.hypot(ev.clientX-x0,ev.clientY-y0)>6){g=document.createElement("div");g.className="ghost";g.textContent=label;document.body.appendChild(g)}
+  if(g){ev.preventDefault();g.style.left=ev.clientX+"px";g.style.top=ev.clientY+"px";
+   var el=document.elementFromPoint(ev.clientX,ev.clientY),d=el&&el.closest("[data-drop]");
+   if(hot&&hot!==d)hot.classList.remove("hot");hot=d;if(d)d.classList.add("hot")}}
+ function up(ev){removeEventListener("pointermove",mv);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+  if(hot)hot.classList.remove("hot");
+  if(!g){if(pay.t=="n")pick(pay.v);return}
+  g.remove();var el=document.elementFromPoint(ev.clientX,ev.clientY),d=el&&el.closest("[data-drop]");
+  drop(pay,d?d.dataset.drop:null)}
+ addEventListener("pointermove",mv,{passive:false});addEventListener("pointerup",up);addEventListener("pointercancel",up)}
+function rnd(){var o=S.op,a,b,r=function(n){return 1+Math.floor(Math.random()*n)};
+ if(o=="+"){a=r(10);b=r(10)}else if(o=="−"){a=r(10);b=r(a)}else if(o=="×"){a=r(10);b=r(10)}else{b=r(5);a=b*r(Math.floor(10/b))}
+ S.a=a;S.b=b;S.act="a";S.z={A:[],B:[],R:[]};reset();draw()}
+(function(){
+ $("ops").innerHTML=OPS.map(function(o,i){return'<button class="op" data-o="'+o+'" aria-pressed="'+(o==S.op)+'" aria-label="'+NAMES[i]+'">'+o+"</button>"}).join("");
+ $("strip").innerHTML=[1,2,3,4,5,6,7,8,9,10].map(function(n){return'<button data-n="'+n+'">'+n+"</button>"}).join("");
+ $("objs").innerHTML='<span class="cap">Drag to board</span>'+OBJ.map(function(o){return'<button class="obj" data-i="'+o+'" aria-label="Object '+o+'">'+o+"</button>"}).join("");
+ $("pad").innerHTML="0123456789".split("").map(function(d){return'<button data-d="'+d+'">'+d+"</button>"}).join("")+'<button data-d="x" aria-label="Delete">⌫</button>';
+ $("ops").onclick=function(e){var o=e.target.closest("[data-o]");if(!o)return;S.op=o.dataset.o;reset();
+  [].forEach.call($("ops").children,function(c){c.setAttribute("aria-pressed",c.dataset.o==S.op)});draw()};
+ $("strip").onpointerdown=function(e){var n=e.target.closest("[data-n]");if(n)drag(e,{t:"n",v:Number(n.dataset.n)},n.dataset.n)};
+ $("strip").onclick=function(e){var n=e.target.closest("[data-n]");if(n&&e.detail===0)pick(Number(n.dataset.n))};
+ $("objs").onpointerdown=function(e){var o=e.target.closest("[data-i]");if(o)drag(e,{t:"o",e:o.dataset.i},o.dataset.i)};
+ $("objs").onclick=function(e){var o=e.target.closest("[data-i]");if(o&&e.detail===0){S.z.R.push(o.dataset.i);draw()}};
+ $("scene").onpointerdown=function(e){var i=e.target.closest(".it");if(i)drag(e,{t:"o",e:S.z[i.dataset.k][i.dataset.j],k:i.dataset.k,j:Number(i.dataset.j)},S.z[i.dataset.k][i.dataset.j])};
+ $("eq").onclick=function(e){var s=e.target.closest("[data-s]");if(s){S.act=s.dataset.s;draw()}};
+ $("pad").onclick=function(e){var d=e.target.closest("[data-d]");if(!d||S.done||ok())return;
+  var v=d.dataset.d;if(v=="x")S.ans=S.ans.slice(0,-1);else if(S.ans.length<3)S.ans+=v;$("msg").textContent="";eq()};
+ $("chk").onclick=check;$("rand").onclick=rnd;
+ $("show").onclick=function(){if(ok())return;var f=function(n){return Array(n+1).join(OBJ[0]).match(/./gu)||[]};
+  S.z={A:f(S.a),B:f(S.b),R:S.op=="+"?f(S.a+S.b):S.op=="−"?f(S.a-S.b):[]};draw();say(S.a+" "+S.op+" "+S.b+" = "+sol(),"ok")};
+ $("clr").onclick=function(){S.a=S.b=null;S.act="a";S.z={A:[],B:[],R:[]};reset();draw()};
+ addEventListener("keydown",function(e){if(e.target.tagName=="BUTTON")return;
+  if(/^[0-9]$/.test(e.key)&&!S.done&&!ok()&&S.ans.length<3){S.ans+=e.key;eq()}
+  else if(e.key=="Backspace"){S.ans=S.ans.slice(0,-1);eq()}else if(e.key=="Enter")check()});
+ var M={ctx:null,on:false,t:0,step:0,timer:null,touched:false},MEL=[0,2,4,7,9,7,4,2,0,4,7,12,9,7,4,2,5,7,9,12,9,7,5,4,2,4,7,9,7,4,2,0],ROOT=[-12,-3,-7,-5];
+ function note(f,t,d,type,v){var o=M.ctx.createOscillator(),g=M.ctx.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(M.out);o.start(t);o.stop(t+d+.05)}
+ function sched(){while(M.t<M.ctx.currentTime+.8){var i=M.step%32,c=261.63;
+  note(c*Math.pow(2,MEL[i]/12),M.t,.9,"triangle",.5);
+  if(i%8==0)note(c*Math.pow(2,ROOT[i/8]/12),M.t,3.1,"sine",.55);
+  if(i%4==2)note(c*Math.pow(2,(MEL[i]+12)/12),M.t,.35,"sine",.12);
+  M.t+=.4;M.step++}}
+ function setMusic(on){if(on===M.on)return;M.on=on;
+  if(on){try{if(!M.ctx){M.ctx=new (window.AudioContext||window.webkitAudioContext)();M.out=M.ctx.createGain();M.out.gain.value=.11;M.out.connect(M.ctx.destination)}
+   M.ctx.resume();M.t=M.ctx.currentTime+.1;sched();M.timer=setInterval(sched,200)}catch(e){M.on=false}}
+  else{clearInterval(M.timer);if(M.ctx)M.ctx.suspend()}
+  $("mus").setAttribute("aria-pressed",M.on);$("mus").textContent=M.on?"🎵":"🔇"}
+ var pref="1";try{pref=localStorage.getItem("np-music")||"1"}catch(e){}
+ $("mus").textContent=pref=="0"?"🔇":"🎵";
+ $("mus").onclick=function(){M.touched=true;setMusic(!M.on);try{localStorage.setItem("np-music",M.on?"1":"0")}catch(e){}};
+ var first=function(e){if(e.target.closest("#mus"))return;removeEventListener("pointerdown",first);if(!M.touched&&pref!="0")setMusic(true)};
+ addEventListener("pointerdown",first);
+ document.addEventListener("visibilitychange",function(){if(!M.ctx||!M.on)return;if(document.hidden){M.ctx.suspend()}else{M.ctx.resume();M.t=Math.max(M.t,M.ctx.currentTime+.1)}});
+ rnd();
+})();
+</script>
+</body></html>
